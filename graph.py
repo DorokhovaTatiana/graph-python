@@ -9,6 +9,7 @@ class Sequence:
         self.isChildren = False
         self.name = ','.join(map(str, self.sequence))
         self.length = len(sequence) - sequence.count(0)
+        self.parents = []
 
 used = []
 sequences = []
@@ -61,6 +62,10 @@ def get_queue(indexReduction, indexIncrease, node, stack):
                     sequences.append(newSequence)
 
                 newSequence = [value for value in sequences if value.name == name][0]
+                parent = { 'valueIncrease': copySequence[indexIncrease],
+                         'valueReduction': copySequence[indexIncrease],
+                        'sequence': node }
+                newSequence.parents.append(parent)
 
                 print(node.name, "    ", newSequence.name)
                 print("___________________________________")
@@ -83,28 +88,40 @@ def is_Graphic_Sequence(sequence, lengthSequence):
              return False
         if w-1 == i:
             return True
-        i+=1;
+        i+=1
     return False
 
 
 
-# def generatingMaximumGraphs():
-#     for sequence in sequences:
-#         k = 0
-#         graph = nx.Graph()
-#         while k < sequence.length:
-#             graph.add_node(k)
-#         for degree in sequence.sequence:
-#             index = degree
-#             k = 0
-#             while index >0 and graph.degree(k) < degree:
-#                 graph.add_edge(k, index)
-#                 index-=1
-#                 k+=1
-#         nx.draw(graph)
-#         plt.savefig("path.png")
+def generatingMaximumGraphs():
+    graphs = {}
+    for sequence in maximumGraphicsSequence:
+        j = 0
+        graph = nx.Graph()
+        while j < sequence.length:
+            degree = sequence.sequence[j]
+            i = 0
+            while i < degree:
+                graph.add_edge(j,i)
+                i+=1
+            j+=1
+        graphs[graph] = sequence
+        # nx.draw(graph)
+        # name = '%s.png' % sequence.name
+        # plt.savefig(name)
+        # plt.clf()
+    return graphs
             
 
+# def all_drawing_Sequence(graphs):
+#     for data in graphs:
+#         graph = data.key
+#         sequence = data.value
+#         for parent in sequence.parents:
+#             valueIncrease = parent['valueIncrease']
+#             valueReduction = parent['valueReduction']
+#             sequence = parent['sequence']
+#             for edge in graph.
 
 
 # print(12)
@@ -112,19 +129,40 @@ def is_Graphic_Sequence(sequence, lengthSequence):
 #
 # sequences.append(seq)
 # bfs(seq)
+# graphs = generatingMaximumGraphs()
+
 graph = nx.Graph()
+a = [5,2,2,1,1,1,0]
+j=0
+graph.add_edge(0,1)
+while j < 7:
+    degree = a[j]
+    i = 2
+    while i <= degree:
+        if graph.degree(j)< degree:
+            graph.add_edge(j, i)
+        i+=1
+    j+=1
+print(111)
+nx.draw(graph)
+name = '%s.png' % "5,2,2,1,1,1,0"
+plt.savefig(name)
+plt.clf()
+for vertex in graph.node:
+    if graph.degree(vertex) == 2:
+        for n in graph.neighbors(vertex):
+            if graph.degree(n) != 0:
+                copyGraph = copy.deepcopy(graph)
+                copyGraph.add_node(7)
+                copyGraph.add_edge(n, 7);
+                copyGraph.remove_edge(vertex, n)
+                nx.draw(copyGraph)
+                name = '%s.png' % n
+                plt.savefig(name)
+                plt.clf()
 
-graph.add_edge(1,2);
-# nx.draw(graph)
-# plt.savefig("path1.png")
 
-graph.add_edge(2,3)
-graph.add_edge(3, 4)
-graph.add_edge(3, 5)
-# nx.draw(graph)
-# plt.savefig("path2.png")
-print(graph.degree(3))
-print(1)
+
 
 
 
