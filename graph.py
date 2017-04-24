@@ -63,12 +63,9 @@ def get_queue(indexReduction, indexIncrease, node, stack):
 
                 newSequence = [value for value in sequences if value.name == name][0]
                 parent = { 'valueIncrease': copySequence[indexIncrease],
-                         'valueReduction': copySequence[indexIncrease],
+                         'indexReduction': indexReduction,
                         'sequence': node }
                 newSequence.parents.append(parent)
-
-                print(node.name, "    ", newSequence.name)
-                print("___________________________________")
 
 
     return stack
@@ -94,72 +91,106 @@ def is_Graphic_Sequence(sequence, lengthSequence):
 
 
 def generatingMaximumGraphs():
-    graphs = {}
+    graphs = []
     for sequence in maximumGraphicsSequence:
         j = 0
         graph = nx.Graph()
+        graph.add_edge(0, 1)
         while j < sequence.length:
             degree = sequence.sequence[j]
-            i = 0
-            while i < degree:
-                graph.add_edge(j,i)
+            i = 2
+            while i <= degree:
+                if graph.degree(j) < degree:
+                    graph.add_edge(j, i)
                 i+=1
             j+=1
-        graphs[graph] = sequence
-        # nx.draw(graph)
-        # name = '%s.png' % sequence.name
-        # plt.savefig(name)
-        # plt.clf()
+
+        graphs.append({'graph': graph, 'sequence': sequence})
     return graphs
             
 
-# def all_drawing_Sequence(graphs):
-#     for data in graphs:
-#         graph = data.key
-#         sequence = data.value
-#         for parent in sequence.parents:
-#             valueIncrease = parent['valueIncrease']
-#             valueReduction = parent['valueReduction']
-#             sequence = parent['sequence']
-#             for edge in graph.
+def all_drawing_Sequence(graphs):
+    count = 0
+    while graphs:
+        print("count ==", len(graphs))
+        data = graphs.pop(0)
+        graph = data['graph']
+        sequence = data['sequence']
+        nx.draw(graph)
+        name = '%s.png' % count
+        plt.savefig(name)
+        plt.clf()
+        count += 1
+        for parent in sequence.parents:
+            valueIncrease = parent['valueIncrease']
+            indexReduction = parent['indexReduction']
+            sequence = parent['sequence']
+            for vertex in graph.node:
+                if graph.degree(vertex) == valueIncrease:
+                    for n in graph.neighbors(vertex):
+                        if graph.degree(n) != sequence.sequence[indexReduction]:
+                            copyGraph = copy.deepcopy(graph)
+                            if indexReduction >= sequence.length:
+                                copyGraph.add_node(indexReduction)
+                            copyGraph.add_edge(n, indexReduction)
+                            copyGraph.remove_edge(vertex, n)
+                            f = False
+                            for a in graphs:
+
+                                if nx.is_isomorphic(a['graph'], copyGraph):
+                                    f =True
+                                    print("no")
+                            if not f:
+                                graphs.append({'graph' : copyGraph, 'sequence': sequence})
 
 
-# print(12)
-# seq = Sequence([1] * 12)
 #
-# sequences.append(seq)
-# bfs(seq)
-# graphs = generatingMaximumGraphs()
+# print(12)
+seq = Sequence([1] * 12)
 
-graph = nx.Graph()
-a = [5,2,2,1,1,1,0]
-j=0
-graph.add_edge(0,1)
-while j < 7:
-    degree = a[j]
-    i = 2
-    while i <= degree:
-        if graph.degree(j)< degree:
-            graph.add_edge(j, i)
-        i+=1
-    j+=1
+sequences.append(seq)
+bfs(seq)
+graphs = generatingMaximumGraphs()
+all_drawing_Sequence(graphs)
+
+# graph = nx.Graph()
+# a = [5,2,2,1,1,1,0]
+# j=0
+# graph.add_edge(0,1)
+# while j < 7:
+#     degree = a[j]
+#     i = 2
+#     while i <= degree:
+#         if graph.degree(j)< degree:
+#             graph.add_edge(j, i)
+#         i+=1
+#     j+=1
 print(111)
-nx.draw(graph)
-name = '%s.png' % "5,2,2,1,1,1,0"
-plt.savefig(name)
-plt.clf()
-for vertex in graph.node:
-    if graph.degree(vertex) == 2:
-        for n in graph.neighbors(vertex):
-            if graph.degree(n) != 0:
-                copyGraph = copy.deepcopy(graph)
-                copyGraph.add_node(7)
-                copyGraph.add_edge(n, 7);
-                copyGraph.remove_edge(vertex, n)
-                nx.draw(copyGraph)
-                name = '%s.png' % n
-                plt.savefig(name)
-                plt.clf()
+# nx.draw(graph)
+# name = '%s.png' % "5,2,2,1,1,1,0"
+# # plt.savefig(name)
+# plt.clf()
+# g = []
+# print(len(graph.node))
+# g.append(graph)
+# for vertex in graph.node:
+#     if graph.degree(vertex) == 2:
+#         for n in graph.neighbors(vertex):
+#             if graph.degree(n) != 0:
+#                 copyGraph = copy.deepcopy(graph)
+#                 copyGraph.add_node(7)
+#                 copyGraph.add_edge(n, 7);
+#                 copyGraph.remove_edge(vertex, n)
+#                 f = False
+#                 for a in g:
+#                     if nx.is_isomorphic(a, copyGraph):
+#                        f =True
+#                 if not f:
+#                     g.append(copyGraph)
+#                     nx.draw(copyGraph)
+#                     name = '%s.png' % n
+#                     plt.savefig(name)
+#                     plt.clf()
 
 
 
