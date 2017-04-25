@@ -100,7 +100,7 @@ def generatingMaximumGraphs():
             degree = sequence.sequence[j]
             i = 2
             while i <= degree:
-                if graph.degree(j) < degree:
+                if graph.degree(j) < degree and i != j:
                     graph.add_edge(j, i)
                 i+=1
             j+=1
@@ -110,6 +110,7 @@ def generatingMaximumGraphs():
             
 
 def all_drawing_Sequence(graphs):
+    findGraphs = [graph['graph'] for graph in graphs]
     count = 0
     while graphs:
         print("count ==", len(graphs))
@@ -117,35 +118,35 @@ def all_drawing_Sequence(graphs):
         graph = data['graph']
         sequence = data['sequence']
         nx.draw(graph)
-        name = '%s.png' % count
+        name = '%d-%s.png' % (count, sequence.name)
         plt.savefig(name)
         plt.clf()
         count += 1
         for parent in sequence.parents:
             valueIncrease = parent['valueIncrease']
             indexReduction = parent['indexReduction']
-            sequence = parent['sequence']
+            seq = parent['sequence']
+
+
             for vertex in graph.node:
                 if graph.degree(vertex) == valueIncrease:
-                    for n in graph.neighbors(vertex):
-                        if graph.degree(n) != sequence.sequence[indexReduction]:
-                            copyGraph = copy.deepcopy(graph)
-                            if indexReduction >= sequence.length:
-                                copyGraph.add_node(indexReduction)
-                            copyGraph.add_edge(n, indexReduction)
-                            copyGraph.remove_edge(vertex, n)
-                            f = False
-                            for a in graphs:
+                    for neighbor in graph.neighbors(vertex):
+                        for n in graph.node:
 
-                                if nx.is_isomorphic(a['graph'], copyGraph):
-                                    f =True
-                                    print("no")
-                            if not f:
-                                graphs.append({'graph' : copyGraph, 'sequence': sequence})
+                            if n != neighbor and vertex != neighbor and vertex!= n:
+                                copygraph = copy.deepcopy(graph)
+                                if sequence.length == indexReduction and neighbor != indexReduction:
+                                    copygraph.add_edge(neighbor, indexReduction)
+                                    copygraph.remove_edge(vertex, neighbor)
 
+                                elif copygraph.degree(n) == sequence.sequence[indexReduction] and n not in copygraph.adjacency_list()[neighbor]:
 
-#
-# print(12)
+                                    copygraph.add_edge(n, neighbor)
+                                    copygraph.remove_edge(vertex, neighbor)
+                                if True not in [nx.is_isomorphic(copygraph, g) for g in findGraphs]:
+                                    graphs.append({'graph': copygraph, 'sequence': seq})
+                                    findGraphs.append(copygraph)
+
 seq = Sequence([1] * 12)
 
 sequences.append(seq)
@@ -154,10 +155,10 @@ graphs = generatingMaximumGraphs()
 all_drawing_Sequence(graphs)
 
 # graph = nx.Graph()
-# a = [5,2,2,1,1,1,0]
+# a = [5,2,2,1,1,1]
 # j=0
 # graph.add_edge(0,1)
-# while j < 7:
+# while j < 6:
 #     degree = a[j]
 #     i = 2
 #     while i <= degree:
@@ -165,36 +166,41 @@ all_drawing_Sequence(graphs)
 #             graph.add_edge(j, i)
 #         i+=1
 #     j+=1
-print(111)
+# print(111)
 # nx.draw(graph)
-# name = '%s.png' % "5,2,2,1,1,1,0"
-# # plt.savefig(name)
+# name = '%s.png' % "5,2,2,1,1,1"
+# plt.savefig(name)
 # plt.clf()
 # g = []
 # print(len(graph.node))
 # g.append(graph)
 # for vertex in graph.node:
-#     if graph.degree(vertex) == 2:
-#         for n in graph.neighbors(vertex):
-#             if graph.degree(n) != 0:
-#                 copyGraph = copy.deepcopy(graph)
-#                 copyGraph.add_node(7)
-#                 copyGraph.add_edge(n, 7);
-#                 copyGraph.remove_edge(vertex, n)
-#                 f = False
-#                 for a in g:
-#                     if nx.is_isomorphic(a, copyGraph):
-#                        f =True
-#                 if not f:
-#                     g.append(copyGraph)
-#                     nx.draw(copyGraph)
-#                     name = '%s.png' % n
-#                     plt.savefig(name)
-#                     plt.clf()
-
-
-
-
-
-
+#     if graph.degree(vertex) == 5:
+#         for neighbor in graph.neighbors(vertex):
+#             for n in graph.node:
+#
+#                 if n != neighbor and vertex != neighbor and vertex != n:
+#                     copygraph = copy.deepcopy(graph)
+#                     if len(a)== 6 and neighbor != 1:
+#                         copygraph.add_edge(neighbor, 6)
+#                         copygraph.remove_edge(vertex, neighbor)
+#
+#                     elif copygraph.degree(n) == a[1] :
+#                         list = copygraph.adjacency_list()
+#                         if neighbor not in list[n]:
+#                             print(neighbor)
+#                         # copygraph.add_edge(n, neighbor)
+#                         # copygraph.remove_edge(vertex, neighbor)
+#
+#                     f = False
+#                     for a in g:
+#
+#                         if nx.is_isomorphic(a, copygraph):
+#                             f = True
+#                     if not f:
+#                         g.append(copygraph)
+#                         nx.draw(graph)
+#                         name = '%s.png' % n
+#                         plt.savefig(copygraph)
+#                         plt.clf()
 
