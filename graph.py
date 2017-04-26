@@ -111,9 +111,9 @@ def generatingMaximumGraphs():
 
 def all_drawing_Sequence(graphs):
     findGraphs = [graph['graph'] for graph in graphs]
-    count = 0
+    count = 1
     while graphs:
-        print("count ==", len(graphs))
+        print("count ==", 1)
         data = graphs.pop(0)
         graph = data['graph']
         sequence = data['sequence']
