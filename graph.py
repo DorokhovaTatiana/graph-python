@@ -56,10 +56,6 @@ def get_queue(index_reduction, index_increase, node, stack):
                     sequences.append(new_sequence)
                     find_graphs.update({new_sequence.name: []})
 
-                new_sequence = [value for value in sequences if value.name == name][0]
-                parent = {'valueIncrease': copy_sequence[index_increase], 'indexReduction': index_reduction, 'sequence': node}
-                new_sequence.parents.append(parent)
-
     return stack
 
 
@@ -101,14 +97,23 @@ def generating_maximal_graphs():
     return max_graphs
 
 
+def add_graph(sequence, graph, neighbor, vertex1, vertex2):
+    if is_graphic_sequence(sequence, len(sequence) - sequence.count(0)):
+        new_sequence = Sequence(sequence)
+        new_graph = copy.deepcopy(graph)
+        new_graph.add_edge(neighbor, vertex2)
+        new_graph.remove_edge(vertex1, neighbor)
+        if (True not in [nx.is_isomorphic(new_graph, g) for g in find_graphs[new_sequence.name]]):
+            find_graphs[new_sequence.name].append(new_graph)
+            graphs.append({'graph': new_graph, 'sequence': seq, 'name': new_sequence.name})
+
+
 def fun(graphs):
-
-
     for graph in graphs:
         find_graphs[graph['name']].append(graph['graph'])
 
     while graphs:
-
+        print(len(graphs))
         data_of_graph = graphs.pop(0)
         graph = data_of_graph['graph']
         sequence = copy.deepcopy(data_of_graph['sequence'])
@@ -120,16 +125,16 @@ def fun(graphs):
                             seq = copy.deepcopy(sequence)
                             seq[vertex1] -= 1
                             seq[vertex2] += 1
-                            s= copy.deepcopy(seq)
+                            s = copy.deepcopy(seq)
                             s.sort(reverse=True)
-                            if is_graphic_sequence(s, len(s) - s.count(0)):
-                                new_sequence = Sequence(s)
-                                new_graph = copy.deepcopy(graph)
-                                new_graph.add_edge(neighbor, vertex2)
-                                new_graph.remove_edge(vertex1, neighbor)
-                                if (True not in [nx.is_isomorphic(new_graph, g) for g in find_graphs[new_sequence.name]]):
-                                    find_graphs[new_sequence.name].append(new_graph)
-                                    graphs.append({'graph': new_graph, 'sequence': seq, 'name': new_sequence.name })
+
+                            new_sequence = Sequence(s)
+                            new_graph = copy.deepcopy(graph)
+                            new_graph.add_edge(neighbor, vertex2)
+                            new_graph.remove_edge(vertex1, neighbor)
+                            if (True not in [nx.is_isomorphic(new_graph, g) for g in find_graphs[new_sequence.name]]):
+                                find_graphs[new_sequence.name].append(new_graph)
+                                graphs.append({'graph': new_graph, 'sequence': seq, 'name': new_sequence.name })
 
 
                 if(neighbor != len(sequence) - sequence.count(0) and sequence[vertex1] > 1):
@@ -138,87 +143,14 @@ def fun(graphs):
                     seq[len(seq) - seq.count(0)] += 1
                     s = copy.deepcopy(seq)
                     s.sort(reverse=True)
-                    if is_graphic_sequence(s, len(s) - s.count(0)-1):
-                        new_sequence = Sequence(s)
-                        new_graph = copy.deepcopy(graph)
-                        new_graph.add_edge(neighbor, len(s) - s.count(0) - 1)
-                        new_graph.remove_edge(vertex1, neighbor)
-                        if (True not in [nx.is_isomorphic(new_graph, g) for g in find_graphs[new_sequence.name]]):
-                            find_graphs[new_sequence.name].append(new_graph)
-                            graphs.append({'graph': new_graph, 'sequence': seq, 'name': new_sequence.name})
+                    new_sequence = Sequence(s)
+                    new_graph = copy.deepcopy(graph)
+                    new_graph.add_edge(neighbor, len(s) - s.count(0) - 1)
+                    new_graph.remove_edge(vertex1, neighbor)
+                    if (True not in [nx.is_isomorphic(new_graph, g) for g in find_graphs[new_sequence.name]]):
+                        find_graphs[new_sequence.name].append(new_graph)
+                        graphs.append({'graph': new_graph, 'sequence': seq, 'name': new_sequence.name})
 
-
-
-                # if(neighbor != data_of_graph['sequence'].length and vertex1!=neighbor):
-                #         if (sequence[vertex1] >= 1):
-                #             seq = copy.deepcopy(sequence)
-                #             seq[vertex1] -= 1
-                #             seq[] += 1
-                #             seq.sort(reverse=True)
-                #             if is_graphic_sequence(seq, data_of_graph['sequence'].length):
-                #                 new_sequence = Sequence(seq)
-                #                 new_graph = copy.deepcopy(graph)
-                #                 new_graph.add_edge(neighbor,)
-                #                 new_graph.remove_edge(vertex1, neighbor)
-                #                 if (True not in [nx.is_isomorphic(new_graph, g) for g in find_graphs[new_sequence.name]]):
-                #                     find_graphs[new_sequence.name].append(new_graph)
-                #                     graphs.append({'graph': new_graph, 'sequence': new_sequence, 'seq': seq})
-
-
-#
-# def all_drawing_sequence(graphs):
-#     for graph in graphs:
-#         find_graphs[graph['sequence'].name].append(graph['graph'])
-#
-#     while graphs:
-#         data_of_graph = graphs.pop(0)
-#         graph = data_of_graph['graph']
-#         sequence = data_of_graph['sequence']
-#
-#         for parent in sequence.parents:
-#             value_increase = parent['valueIncrease']
-#             index_reduction = parent['indexReduction']
-#             new_sequence = parent['sequence']
-#
-#             for vertex1 in graph.node:
-#                 if graph.degree(vertex1) == value_increase:
-#                     for neighbor in graph.neighbors(vertex1):
-#                         for vertex2 in graph.node:
-#                             if vertex2 != neighbor and vertex1 != neighbor and vertex1 != vertex2:
-#                                 copy_graph = graph
-#                                 if sequence.length == index_reduction and neighbor != index_reduction:
-#                                     copy_graph = copy.deepcopy(graph)
-#                                     copy_graph.add_edge(neighbor, index_reduction)
-#                                     copy_graph.remove_edge(vertex1, neighbor)
-#
-#                                 if copy_graph.degree(vertex2) == sequence.sequence[index_reduction] \
-#                                         and vertex2 not in copy_graph.adjacency_list()[neighbor]:
-#                                     copy_graph = copy.deepcopy(graph)
-#                                     copy_graph.add_edge(neighbor, vertex2)
-#                                     copy_graph.remove_edge(vertex1, neighbor)
-#
-#                                 if copy_graph != graph and True not in [nx.is_isomorphic(copy_graph, g) for g in
-#                                                                         find_graphs[new_sequence.name]]:
-#                                     find_graphs[new_sequence.name].append(copy_graph)
-#                                     graphs.append({'graph': copy_graph, 'sequence': new_sequence})
-#
-#     rotate_edges()
-#
-#
-# def rotate_edges():
-#     for name_of_graph in find_graphs:
-#         for graph in find_graphs[name_of_graph]:
-#             for vertex1 in graph:
-#                 edges = graph.adjacency_list()[vertex1]
-#                 for target in edges:
-#                     for vertex2 in graph:
-#                         if vertex1 != vertex2 and graph.degree(vertex1) - graph.degree(vertex2) == 1 \
-#                                 and target != vertex2 and target not in graph.adjacency_list()[vertex2]:
-#                             copy_graph = copy.deepcopy(graph)
-#                             copy_graph.add_edge(target, vertex2)
-#                             copy_graph.remove_edge(target, vertex1)
-#                             if True not in [nx.is_isomorphic(copy_graph, g) for g in find_graphs[name_of_graph]]:
-#                                 find_graphs[name_of_graph].append(copy_graph)
 
 
 def drawing_graphs():
@@ -232,7 +164,7 @@ def drawing_graphs():
             count += 1
 
 start = time.time()
-seq = Sequence([1] * 12)
+seq = Sequence([1] * 22)
 used = []
 sequences = []
 find_graphs = {}
