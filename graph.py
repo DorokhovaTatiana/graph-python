@@ -12,7 +12,7 @@ class Sequence:
         self.parents = []
 
 
-def bfs(sequence):
+def max_sequences(sequence):
     stack = [sequence]
     while stack:
         current_sequence = stack.pop(0)
@@ -97,18 +97,23 @@ def generating_maximal_graphs():
     return max_graphs
 
 
-def add_graph(sequence, graph, neighbor, vertex1, vertex2):
-    if is_graphic_sequence(sequence, len(sequence) - sequence.count(0)):
-        new_sequence = Sequence(sequence)
-        new_graph = copy.deepcopy(graph)
-        new_graph.add_edge(neighbor, vertex2)
-        new_graph.remove_edge(vertex1, neighbor)
-        if (True not in [nx.is_isomorphic(new_graph, g) for g in find_graphs[new_sequence.name]]):
-            find_graphs[new_sequence.name].append(new_graph)
-            graphs.append({'graph': new_graph, 'sequence': seq, 'name': new_sequence.name})
+def fun(sequence, graph, vertex1, neighbor, vertex2):
+    seq = copy.deepcopy(sequence)
+    seq[vertex1] -= 1
+    seq[vertex2] += 1
+    s = copy.deepcopy(seq)
+    s.sort(reverse=True)
+    new_sequence = Sequence(s)
+    new_graph = copy.deepcopy(graph)
+    new_graph.add_edge(neighbor, vertex2)
+    new_graph.remove_edge(vertex1, neighbor)
+    if (True not in [nx.is_isomorphic(new_graph, g) for g in find_graphs[new_sequence.name]]):
+        find_graphs[new_sequence.name].append(new_graph)
+        graphs.append({'graph': new_graph, 'sequence': seq, 'name': new_sequence.name})
 
+    return graphs
 
-def fun(graphs):
+def generating_graphs(graphs):
     for graph in graphs:
         find_graphs[graph['name']].append(graph['graph'])
 
@@ -120,36 +125,12 @@ def fun(graphs):
         for vertex1 in graph.node:
             for neighbor in graph.neighbors(vertex1):
                 for vertex2 in graph.node:
-                    if (vertex2 != neighbor and vertex2 != vertex1 and graph.degree(vertex1) - graph.degree(vertex2) >= 1):
+                    if (vertex2 != neighbor and vertex2 != vertex1 and graph.degree(vertex1) - graph.degree(vertex2) >= 2):
                         if(neighbor not in graph.adjacency_list()[vertex2] and sequence[vertex1] >= 1):
-                            seq = copy.deepcopy(sequence)
-                            seq[vertex1] -= 1
-                            seq[vertex2] += 1
-                            s = copy.deepcopy(seq)
-                            s.sort(reverse=True)
-
-                            new_sequence = Sequence(s)
-                            new_graph = copy.deepcopy(graph)
-                            new_graph.add_edge(neighbor, vertex2)
-                            new_graph.remove_edge(vertex1, neighbor)
-                            if (True not in [nx.is_isomorphic(new_graph, g) for g in find_graphs[new_sequence.name]]):
-                                find_graphs[new_sequence.name].append(new_graph)
-                                graphs.append({'graph': new_graph, 'sequence': seq, 'name': new_sequence.name })
-
+                            graphs = fun(sequence, graph, vertex1, neighbor, vertex2)
 
                 if(neighbor != len(sequence) - sequence.count(0) and sequence[vertex1] > 1):
-                    seq = copy.deepcopy(sequence)
-                    seq[vertex1] -= 1
-                    seq[len(seq) - seq.count(0)] += 1
-                    s = copy.deepcopy(seq)
-                    s.sort(reverse=True)
-                    new_sequence = Sequence(s)
-                    new_graph = copy.deepcopy(graph)
-                    new_graph.add_edge(neighbor, len(s) - s.count(0) - 1)
-                    new_graph.remove_edge(vertex1, neighbor)
-                    if (True not in [nx.is_isomorphic(new_graph, g) for g in find_graphs[new_sequence.name]]):
-                        find_graphs[new_sequence.name].append(new_graph)
-                        graphs.append({'graph': new_graph, 'sequence': seq, 'name': new_sequence.name})
+                   graphs = fun(sequence, graph, vertex1, neighbor, len(sequence) - sequence.count(0))
 
 
 
@@ -164,16 +145,16 @@ def drawing_graphs():
             count += 1
 
 start = time.time()
-seq = Sequence([1] * 22)
+seq = Sequence([1] * 20)
 used = []
 sequences = []
 find_graphs = {}
 maximum_graphic_sequences = []
 sequences.append(seq)
 find_graphs.update({seq.name: []})
-bfs(seq)
+max_sequences(seq)
 graphs = generating_maximal_graphs()
-fun(graphs)
+generating_graphs(graphs)
 drawing_graphs()
 end = time.time()
 print(end - start)
